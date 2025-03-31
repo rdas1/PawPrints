@@ -24,10 +24,14 @@ const Pet = {
     `, [id], callback);
   },
 
-  getFiltered({ status, priority, animal_type_id }, callback) {
+  getFiltered({ name, status, priority, animal_type_id }, callback) {
     const conditions = [];
     const params = [];
   
+    if (name) {
+        conditions.push("LOWER(pets.name) LIKE ?");
+        params.push(`%${name.toLowerCase()}%`);
+    }
     if (status) {
       conditions.push("status = ?");
       params.push(status);

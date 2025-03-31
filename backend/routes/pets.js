@@ -8,9 +8,7 @@ const Pet = require('../models/pet');
 // PUT '/:id' updates the status and priority of a pet
 // DELETE '/:id' deletes a pet by id
 
-// TODO: Add routes for retrieving pets filtered by type, status, and priority
-
-// TODO: Add routes for getting pets by id
+// TODO: Add route for getting pet by name
 
 router.get('/', (req, res) => {
     Pet.getFiltered(req.query, (err, rows) => {
