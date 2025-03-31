@@ -1,29 +1,54 @@
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
-export function FilterBar({ filters, setFilters }) {
+interface FilterBarProps {
+  filters: any;
+  setFilters: React.Dispatch<React.SetStateAction<any>>;
+}
+
+export function FilterBar({ filters, setFilters }: FilterBarProps) {
   return (
-    <div className="flex flex-wrap gap-4 items-center p-4">
+    <div className="flex flex-wrap gap-4 p-4 items-end">
       <Input
         placeholder="Search by name"
         value={filters.name}
-        onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+        onChange={(e) => setFilters((prev: any) => ({ ...prev, name: e.target.value }))}
+        className="w-[200px]"
       />
 
       <Select
-        onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
-        defaultValue={filters.status}
+        value={filters.status}
+        onValueChange={(value) =>
+            setFilters((prev: any) => ({ ...prev, status: value === "all" ? "" : value }))
+          }
       >
-        <SelectTrigger className="w-[180px]">Status</SelectTrigger>
+        <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status" />
+        </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All</SelectItem>
-          <SelectItem value="Available for Adoption">Available</SelectItem>
-          <SelectItem value="Adopted">Adopted</SelectItem>
-          <SelectItem value="In Care">In Care</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="Available for Adoption">Available</SelectItem>
+            <SelectItem value="Adopted">Adopted</SelectItem>
+            <SelectItem value="In Care">In Care</SelectItem>
         </SelectContent>
       </Select>
 
-      {/* You could also add Priority and Animal Type dropdowns here */}
+      <Select
+        value={filters.priority}
+        onValueChange={(value) =>
+            setFilters((prev: any) => ({ ...prev, priority: value === "all" ? "" : value }))
+        }
+      >
+        <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Priority" />
+        </SelectTrigger>
+        <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="High">High</SelectItem>
+            <SelectItem value="Medium">Medium</SelectItem>
+            <SelectItem value="Low">Low</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
