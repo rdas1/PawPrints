@@ -10,7 +10,9 @@ export default function Home() {
     name: "",
     status: "",
     priority: "",
-    animal_type_id: ""
+    animal_type_id: "",
+    sortBy: "",
+    sortOrder: "asc"
   });
 
   const [animalTypes, setAnimalTypes] = useState<AnimalType[]>([]);

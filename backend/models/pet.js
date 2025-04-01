@@ -24,36 +24,61 @@ const Pet = {
     `, [id], callback);
   },
 
-  getFiltered({ name, status, priority, animal_type_id }, callback) {
+  getFiltered({ name, status, priority, animal_type_id, sortBy, sortOrder }, callback) {
     const conditions = [];
     const params = [];
   
     if (name) {
-        conditions.push("LOWER(pets.name) LIKE ?");
-        params.push(`%${name.toLowerCase()}%`);
+      conditions.push("LOWER(pets.name) LIKE ?");
+      params.push(`%${name.toLowerCase()}%`);
     }
+  
     if (status) {
-      conditions.push("status = ?");
+      conditions.push("pets.status = ?");
       params.push(status);
     }
+  
     if (priority) {
-      conditions.push("priority = ?");
+      conditions.push("pets.priority = ?");
       params.push(priority);
     }
+  
     if (animal_type_id) {
-      conditions.push("animal_type_id = ?");
+      conditions.push("pets.animal_type_id = ?");
       params.push(animal_type_id);
     }
   
     const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
   
-    db.all(`
+    let orderClause = "";
+    if (sortBy) {
+      const direction = sortOrder === "desc" ? "DESC" : "ASC";
+      if (sortBy === "priority") {
+        orderClause = `
+          ORDER BY
+            CASE pets.priority
+              WHEN 'High' THEN 3
+              WHEN 'Medium' THEN 2
+              WHEN 'Low' THEN 1
+            END ${direction}
+        `;
+      } else if (sortBy === "name") {
+        orderClause = `ORDER BY pets.name COLLATE NOCASE ${direction}`;
+      }
+    }
+  
+    db.all(
+      `
       SELECT pets.*, animal_types.name as animal_type
       FROM pets
       LEFT JOIN animal_types ON pets.animal_type_id = animal_types.id
       ${whereClause}
-    `, params, callback);
-  }, 
+      ${orderClause}
+      `,
+      params,
+      callback
+    );
+  },  
 
   create({ name, status = 'Available for Adoption', animal_type_id, priority = 'Medium' }, callback) {
     db.run(`

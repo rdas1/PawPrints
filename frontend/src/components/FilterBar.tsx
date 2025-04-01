@@ -55,7 +55,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
             <Select
                 value={filters.animal_type_id?.toString() || ""}
                 onValueChange={(value) =>
-                    setFilters(prev => ({
+                    setFilters((prev: any) => ({
                         ...prev,
                         animal_type_id: value === "all" ? "" : Number(value)
                     }))
@@ -71,6 +71,37 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                             {type.name}
                         </SelectItem>
                     ))}
+                </SelectContent>
+            </Select>
+            
+            <Select
+                value={filters.sortBy || ""}
+                onValueChange={(value) =>
+                    setFilters((prev: any) => ({ ...prev, sortBy: value === "none" ? "" : value }))
+                }
+            >
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="none">No Sorting</SelectItem>
+                    <SelectItem value="name">Name (A → Z)</SelectItem>
+                    <SelectItem value="priority">Priority</SelectItem>
+                </SelectContent>
+            </Select>
+
+            <Select
+                value={filters.sortOrder || "asc"}
+                onValueChange={(value) =>
+                    setFilters((prev: any) => ({ ...prev, sortOrder: value }))
+                }
+            >
+                <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="Order" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
                 </SelectContent>
             </Select>
 

@@ -7,6 +7,8 @@ interface PetFilters {
   status?: string;
   animal_type_id?: number;
   priority?: string;
+  sortBy?: "name" | "priority";
+  sortOrder?: "asc" | "desc";
 }
 
 function buildQuery(params: PetFilters): string {
