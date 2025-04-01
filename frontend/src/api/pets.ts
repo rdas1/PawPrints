@@ -2,15 +2,13 @@ import { Pet } from "@/types";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface PetFilters {
+export interface PetFilters {
   name?: string;
   status?: string;
-  animal_type_id?: number;
+  animal_type_id?: number | "";
   priority?: string;
-  sortBy?: "name" | "priority";
-  sortOrder?: "asc" | "desc";
-  limit?: number;
-  offset?: number;
+  sortBy?: "name" | "priority" | "";
+  sortOrder?: "asc" | "desc" | "";
 }
 
 function buildQuery(params: PetFilters): string {
@@ -28,4 +26,12 @@ export async function fetchPets(filters: PetFilters = {}): Promise<Pet[]> {
   const res = await fetch(`${BASE_URL}/pets?${query}`);
   if (!res.ok) throw new Error("Failed to fetch pets");
   return res.json();
+}
+
+export async function fetchPetCount(filters: PetFilters = {}): Promise<number> {
+  const query = buildQuery(filters);
+  const res = await fetch(`${BASE_URL}/pets/count?${query}`);
+  if (!res.ok) throw new Error("Failed to fetch pet count");
+  const data = await res.json();
+  return data.total;
 }

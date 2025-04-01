@@ -46,9 +46,9 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="High">High Priority</SelectItem>
+                    <SelectItem value="Medium">Medium Priority</SelectItem>
+                    <SelectItem value="Low">Low Priority</SelectItem>
                 </SelectContent>
             </Select>
             
@@ -85,7 +85,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     }
                 }}
             >
-                <SelectTrigger className="w-[220px]">
+                <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>

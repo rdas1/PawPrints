@@ -15,7 +15,14 @@ router.get('/', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
-});  
+});
+
+router.get("/count", (req, res) => {
+    Pet.countFiltered(req.query, (err, row) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ total: row.total });
+    });
+  });  
 
 router.get('/:id', (req, res) => {
     Pet.getById(req.params.id, (err, row) => {

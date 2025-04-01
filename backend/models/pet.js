@@ -1,10 +1,13 @@
 const db = require('../db');
 
 // Queries for CRUD operations on the pets table
-// The getAll method returns all pets with their animal type names
+// The getAll method returns all pets (along with their animal type names)
+// The getById method returns a pet by id (with its animal type name)
+// The getFiltered method returns pets that match the filter (with their animal type names)
 // The create method inserts a new pet and returns its id
 // The update method updates the status and priority of a pet
 // The delete method deletes a pet by id
+// The countFiltered method returns the total number of pets that match the filter
 
 const Pet = {
   getAll(callback) {
@@ -85,6 +88,32 @@ const Pet = {
       callback
     );
   },  
+
+  countFiltered({ name, status, priority, animal_type_id }, callback) {
+    const conditions = [];
+    const params = [];
+  
+    if (name) {
+      conditions.push("LOWER(name) LIKE ?");
+      params.push(`%${name.toLowerCase()}%`);
+    }
+    if (status) {
+      conditions.push("status = ?");
+      params.push(status);
+    }
+    if (priority) {
+      conditions.push("priority = ?");
+      params.push(priority);
+    }
+    if (animal_type_id) {
+      conditions.push("animal_type_id = ?");
+      params.push(animal_type_id);
+    }
+  
+    const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  
+    db.get(`SELECT COUNT(*) as total FROM pets ${whereClause}`, params, callback);
+  },
 
   create({ name, status = 'Available for Adoption', animal_type_id, priority = 'Medium' }, callback) {
     db.run(`
