@@ -124,11 +124,16 @@ const Pet = {
     });
   },
 
-  update(id, { status, priority }, callback) {
-    db.run(`
-      UPDATE pets SET status = ?, priority = ?
+  update(id, { name, status, priority, animal_type_id }, callback) {
+    db.run(
+      `
+      UPDATE pets
+      SET name = ?, status = ?, priority = ?, animal_type_id = ?
       WHERE id = ?
-    `, [status, priority, id], callback);
+      `,
+      [name, status, priority, animal_type_id, id],
+      callback
+    );
   },
 
   delete(id, callback) {

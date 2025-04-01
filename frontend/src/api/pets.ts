@@ -35,3 +35,27 @@ export async function fetchPetCount(filters: PetFilters = {}): Promise<number> {
   const data = await res.json();
   return data.total;
 }
+
+export async function fetchPet(id: number): Promise<Pet> {
+  const res = await fetch(`${BASE_URL}/pets/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch pet");
+  return res.json();
+}
+
+export async function updatePet(id: number, data: Partial<Pet>): Promise<Pet> {
+  const res = await fetch(`${BASE_URL}/pets/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update pet");
+  return res.json();
+}
+
+export async function deletePet(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/pets/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete pet");
+}
+
