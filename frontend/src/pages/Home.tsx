@@ -24,12 +24,23 @@ export default function Home() {
   }, []);
 
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPageInput, setPerPageInput] = useState("8");
+  const [perPage, setPerPage] = useState(8);
   const [totalPets, setTotalPets] = useState(0);
-  
   const offset = (page - 1) * perPage;
   const totalPages = Math.ceil(totalPets / perPage);
   
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const parsed = parseInt(perPageInput, 10);
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= 50) {
+        setPerPage(parsed);
+      }
+    }, 300);
+  
+    return () => clearTimeout(timeout);
+  }, [perPageInput]);
+
   // Memoize filters + pagination for stable reference
   const memoizedFilters = useMemo(
     () => ({ ...filters, limit: perPage, offset }),
@@ -110,8 +121,14 @@ export default function Home() {
           type="number"
           min={1}
           max={50}
-          value={perPage}
-          onChange={(e) => setPerPage(Number(e.target.value))}
+          value={perPageInput}
+          onChange={(e) => setPerPageInput(e.target.value)}
+          onBlur={() => {
+            const parsed = parseInt(perPageInput, 10);
+            if (isNaN(parsed) || parsed < 1 || parsed > 50) {
+              setPerPageInput(perPage.toString()); // Reset to last valid value
+            }
+          }}
           className="w-20 border rounded px-2 py-1 text-sm"
         />
       </div>
