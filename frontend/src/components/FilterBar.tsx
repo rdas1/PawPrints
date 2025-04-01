@@ -73,35 +73,26 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     ))}
                 </SelectContent>
             </Select>
-            
+
             <Select
-                value={filters.sortBy || ""}
-                onValueChange={(value) =>
-                    setFilters((prev: any) => ({ ...prev, sortBy: value === "none" ? "" : value }))
-                }
+                value={filters.sortBy ? `${filters.sortBy}|${filters.sortOrder}` : ""}
+                onValueChange={(value) => {
+                    if (value === "none") {
+                        setFilters((prev: any) => ({ ...prev, sortBy: "", sortOrder: "" }));
+                    } else {
+                        const [sortBy, sortOrder] = value.split("|");
+                        setFilters((prev: any) => ({ ...prev, sortBy, sortOrder }));
+                    }
+                }}
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[220px]">
                     <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="none">No Sorting</SelectItem>
-                    <SelectItem value="name">Name (A → Z)</SelectItem>
-                    <SelectItem value="priority">Priority</SelectItem>
-                </SelectContent>
-            </Select>
-
-            <Select
-                value={filters.sortOrder || "asc"}
-                onValueChange={(value) =>
-                    setFilters((prev: any) => ({ ...prev, sortOrder: value }))
-                }
-            >
-                <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Order" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="asc">Ascending</SelectItem>
-                    <SelectItem value="desc">Descending</SelectItem>
+                    <SelectItem value="priority|desc">Priority</SelectItem>
+                    <SelectItem value="name|asc">Name (A → Z)</SelectItem>
+                    <SelectItem value="name|desc">Name (Z → A)</SelectItem>
                 </SelectContent>
             </Select>
 
