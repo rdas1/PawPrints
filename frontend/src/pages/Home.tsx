@@ -21,6 +21,10 @@ export default function Home() {
     fetchAnimalTypes().then(setAnimalTypes).catch(console.error);
   }, []);
 
+  const [page, setPage] = useState(1);
+  const limit = 6;
+  const offset = (page - 1) * limit;
+
   const { pets, loading, error } = usePets(filters);
 
   return (
@@ -34,6 +38,22 @@ export default function Home() {
       {loading && <p className="p-4">Loading...</p>}
       {error && <p className="p-4 text-red-600">Error: {error}</p>}
       {!loading && <PetGrid pets={pets} />}
+      <div className="flex justify-center gap-4 py-4">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(p => p - 1)}
+          className="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          disabled={pets.length < limit}
+          onClick={() => setPage(p => p + 1)}
+          className="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

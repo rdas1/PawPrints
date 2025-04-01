@@ -24,7 +24,7 @@ const Pet = {
     `, [id], callback);
   },
 
-  getFiltered({ name, status, priority, animal_type_id, sortBy, sortOrder }, callback) {
+  getFiltered({ name, status, priority, animal_type_id, sortBy, sortOrder, limit, offset }, callback) {
     const conditions = [];
     const params = [];
   
@@ -66,6 +66,11 @@ const Pet = {
         orderClause = `ORDER BY pets.name COLLATE NOCASE ${direction}`;
       }
     }
+
+    let limitClause = "LIMIT 10 OFFSET 0";
+    if (limit !== undefined && offset !== undefined) {
+      limitClause = `LIMIT ${limit} OFFSET ${offset}`;
+    }
   
     db.all(
       `
@@ -74,6 +79,7 @@ const Pet = {
       LEFT JOIN animal_types ON pets.animal_type_id = animal_types.id
       ${whereClause}
       ${orderClause}
+      ${limitClause}
       `,
       params,
       callback

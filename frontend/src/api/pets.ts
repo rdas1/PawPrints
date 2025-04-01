@@ -9,6 +9,8 @@ interface PetFilters {
   priority?: string;
   sortBy?: "name" | "priority";
   sortOrder?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
 }
 
 function buildQuery(params: PetFilters): string {
