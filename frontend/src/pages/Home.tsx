@@ -12,7 +12,8 @@ import { CreatePetModal } from "@/components/CreatePetModal";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import SleepyFooter from "@/components/SleepyFooter";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingScreen from "@/components/LoadingScreen";
+import InlineLoadingAnimation from "@/components/InlineLoadingAnimation";
 
 export default function Home() {
   const [filters, setFilters] = useState<PetFilters>({
@@ -46,11 +47,27 @@ export default function Home() {
 
   const { pets, loading, error } = usePets(memoizedFilters);
 
-  // Show splash screen for minimum of 1s
+  // Show splash screen for minimum of 1s, then set showSplash to false
+    useEffect(() => {
+      if (!loading) {
+        const timeout = setTimeout(() => {
+          setShowSplash(false);
+        }, 1000); // 1 second splash
+        return () => clearTimeout(timeout);
+      }
+    }, [loading]);
+
   useEffect(() => {
-    const timeout = setTimeout(() => setShowSplash(false), 1000);
+    const timeout = setTimeout(() => {
+      const parsed = parseInt(perPageInput, 10);
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= 50) {
+        setPerPage(parsed);
+      }
+    }, 300);
+  
     return () => clearTimeout(timeout);
-  }, []);
+  }, [perPageInput]);
+
 
   const startIndex = offset + 1;
   const endIndex = Math.min(offset + pets.length, totalPets);
@@ -59,7 +76,7 @@ export default function Home() {
   if (showSplash) {
     return (
       <div className="fixed inset-0 bg-[#294F4F] z-50 flex flex-col items-center justify-center transition-opacity duration-700">
-        <LoadingSpinner />
+        <LoadingScreen />
       </div>
     );
   }
@@ -77,6 +94,11 @@ export default function Home() {
         </button>
       </div>
 
+      {loading && !showSplash && (
+        <div className="min-h-[100px]">
+          <InlineLoadingAnimation />
+        </div>
+      )}
       {error && <p className="p-4 text-red-600">Error: {error}</p>}
 
       <PetGrid
