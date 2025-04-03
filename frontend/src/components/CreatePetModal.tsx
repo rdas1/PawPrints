@@ -96,14 +96,14 @@ import {
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent
-          className="w-full max-w-lg"
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 50,
-          }}
+        //   className="w-full max-w-lg"
+        //   style={{
+        //     position: "fixed",
+        //     top: "50%",
+        //     left: "50%",
+        //     transform: "translate(-50%, -50%)",
+        //     zIndex: 50,
+        //   }}
         >
           <DialogHeader>
             <DialogTitle>Add New Pet</DialogTitle>

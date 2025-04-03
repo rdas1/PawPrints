@@ -5,7 +5,7 @@ import { Pet } from "@/types";
 import { createAnimalType, fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
 import CreatableSelect from "react-select/creatable";
-import { ActionMeta, SingleValue } from "react-select";
+import { SingleValue } from "react-select";
 
 export default function PetDetailPage() {
   const { id } = useParams();
@@ -67,7 +67,7 @@ export default function PetDetailPage() {
         name,
         status,
         priority,
-        animal_type_id,
+        // animal_type_id,
       });
 
       const refreshed = await fetchPet(Number(id));
@@ -118,7 +118,7 @@ export default function PetDetailPage() {
               }))
             }
           >
-            <option value="Available">Available</option>
+            <option value="Available for Adoption">Available for Adoption</option>
             <option value="In Care">In Care</option>
             <option value="Adopted">Adopted</option>
           </select>
@@ -145,7 +145,7 @@ export default function PetDetailPage() {
               value={selectedAnimalType}
               onChange={(
                 newValue: SingleValue<{ value: number; label: string }> | null,
-                actionMeta: ActionMeta<{ value: number; label: string }>
+                // actionMeta: ActionMeta<{ value: number; label: string }>
               ) => {
                 if (!newValue) {
                   setForm((f) => ({ ...f, animal_type_id: undefined }));

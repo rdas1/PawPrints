@@ -15,7 +15,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                 placeholder="Search by name"
                 value={filters.name}
                 onChange={(e) => setFilters((prev: any) => ({ ...prev, name: e.target.value }))}
-                className="w-[200px]"
+                className="w-[200px] bg-white border border-[#dcdcdc]"
             />
 
             <Select
@@ -24,7 +24,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     setFilters((prev: any) => ({ ...prev, status: value === "all" ? "" : value }))
                 }
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white border border-[#dcdcdc] ">
                     <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -41,7 +41,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     setFilters((prev: any) => ({ ...prev, priority: value === "all" ? "" : value }))
                 }
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white border border-[#dcdcdc]">
                     <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -61,7 +61,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     }))
                 }
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white border border-[#dcdcdc]">
                     <SelectValue placeholder="Animal Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -85,7 +85,7 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     }
                 }}
             >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white border border-[#dcdcdc]">
                     <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>

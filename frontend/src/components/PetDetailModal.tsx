@@ -18,6 +18,7 @@ import {
     pet: Pet | null;
     animalTypes: AnimalType[];
     onSave: (updated: Partial<Pet>) => void;
+    onDelete?: (id: number) => void;
   };
   
   export function PetDetailModal({
@@ -26,6 +27,7 @@ import {
     pet,
     animalTypes,
     onSave,
+    onDelete,
   }: Props) {
     const [localAnimalTypes, setLocalAnimalTypes] = useState<AnimalType[]>(animalTypes);
     const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({});
@@ -58,9 +60,8 @@ import {
       });
     };
   
-    // Options
     const statusOptions = [
-      { value: "Available", label: "Available" },
+      { value: "Available for Adoption", label: "Available for Adoption" },
       { value: "In Care", label: "In Care" },
       { value: "Adopted", label: "Adopted" },
     ];
@@ -88,16 +89,7 @@ import {
   
     return (
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent
-          className="w-full max-w-lg"
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 50,
-          }}
-        >
+        <DialogContent className="max-w-lg top-1/2 left-1/2 fixed transform -translate-x-1/2 -translate-y-1/2 z-50">
           <DialogHeader>
             <DialogTitle>{pet ? `Edit ${pet.name}` : "Add New Pet"}</DialogTitle>
           </DialogHeader>
@@ -111,7 +103,7 @@ import {
                 placeholder="Pet name"
               />
             </div>
-
+  
             <div className="space-y-1">
               <label className="text-sm font-medium">Animal Type</label>
               <CreatableSelect
@@ -143,7 +135,7 @@ import {
                 }}
               />
             </div>
-
+  
             <div className="space-y-1">
               <label className="text-sm font-medium">Status</label>
               <Select
@@ -179,18 +171,32 @@ import {
                 }}
               />
             </div>
-    
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                disabled={!isDirty}
-                onClick={() => onSave(form)}
-                className="bg-blue-600 text-white"
-              >
-                Save
-              </Button>
+  
+            <div className="flex justify-between items-center pt-4">
+              {pet && onDelete && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    const confirm = window.confirm(`Delete ${pet.name}?`);
+                    if (confirm) onDelete(pet.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+  
+              <div className="flex gap-2 ml-auto">
+                <Button variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!isDirty}
+                  onClick={() => onSave(form)}
+                  className="bg-blue-600 text-white"
+                >
+                  Save
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>

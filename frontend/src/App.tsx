@@ -1,15 +1,14 @@
-import Home from "@/pages/Home";
-import 'sonner/dist/index.css';
-import { Toaster } from "sonner"; // ✅ Add this
+import { RouterProvider } from "react-router-dom";
+import { router } from "@/router";
+// import { Toaster } from "@/components/ui/sonner"; // or wherever you placed this
 
 function App() {
+  console.log("App.tsx loaded ✅")
   return (
-    <>
-      <div className="min-h-screen bg-muted text-foreground font-sans">
-        <Home />
-      </div>
-      <Toaster position="top-center" /> {/* ✅ Render this once at root level */}
-    </>
+    <div className="min-h-screen bg-background-100 text-white font-body">
+      <RouterProvider router={router} />
+      {/* <Toaster position="bottom-right" /> */}
+    </div>
   );
 }
 
