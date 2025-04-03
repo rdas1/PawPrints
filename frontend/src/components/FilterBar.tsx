@@ -10,12 +10,12 @@ interface FilterBarProps {
 
 export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) {
     return (
-        <div className="flex flex-wrap gap-4 p-4 items-end">
+        <div className="flex flex-wrap gap-4 items-end">
             <Input
                 placeholder="Search by name"
                 value={filters.name}
                 onChange={(e) => setFilters((prev: any) => ({ ...prev, name: e.target.value }))}
-                className="w-[200px] bg-white border border-[#dcdcdc]"
+                className="w-[180px] bg-white border border-[#dcdcdc]"
             />
 
             <Select

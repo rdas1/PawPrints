@@ -1,14 +1,22 @@
+// src/router.tsx
 import { createBrowserRouter } from "react-router-dom";
 import Home from "@/pages/Home";
-// import PetDetailPage from "@/pages/PetDetailPage";
+import About from "@/pages/About"; // if it exists
+import MainLayout from "@/layouts/MainLayout";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <MainLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "about",
+        element: <About />,
+      },
+    ],
   },
-//   {
-//     path: "/pets/:id",
-//     element: <PetDetailPage />,
-//   },
 ]);

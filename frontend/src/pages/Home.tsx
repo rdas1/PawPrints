@@ -93,20 +93,19 @@ export default function Home() {
 
   return (
     <div>
-      <div className="flex items-center justify-between px-4 pt-4">
-        <h1 className="text-2xl text-[#E8F1E5] font-semibold ">Available Pets</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4">
+        <FilterBar
+          filters={filters}
+          setFilters={setFilters}
+          animalTypes={animalTypes}
+        />
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-[#D67272] text-white hover:bg-[#c55c5c] px-4 py-2 rounded text-md cursor-pointer transition"
+          className="bg-[#D67272] text-white hover:bg-[#c55c5c] text-white px-4 py-2 rounded text-md font-semibold font-display self-start md:self-auto cursor-pointer transition"
         >
           Add Pet
         </button>
       </div>
-      <FilterBar
-        filters={filters}
-        setFilters={setFilters}
-        animalTypes={animalTypes}
-      />
       {loading && <p className="p-4">Loading...</p>}
       {error && <p className="p-4 text-red-600">Error: {error}</p>}
       {!loading && (
@@ -149,7 +148,7 @@ export default function Home() {
               >
                 Previous
               </Button>
-              <span className="text-sm whitespace-nowrap">
+              <span className="text-sm whitespace-nowrap text-white">
                 Page {page} of {totalPages || 1}
               </span>
               <Button
@@ -162,7 +161,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-2">
-              <label htmlFor="perPage" className="text-sm whitespace-nowrap">
+              <label htmlFor="perPage" className="text-sm whitespace-nowrap text-white">
                 Pets per page:
               </label>
               <input

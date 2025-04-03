@@ -1,5 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 import { router } from "@/router";
+import { NavBar } from "./layouts/MainLayout";
 // import { Toaster } from "@/components/ui/sonner"; // or wherever you placed this
 
 function App() {
