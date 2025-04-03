@@ -19,23 +19,38 @@ import {
     onSave: (updated: Partial<Pet>) => void;
   };
   
-  export function PetDetailModal({ open, onClose, pet, animalTypes, onSave }: Props) {
-    const [localAnimalTypes, setLocalAnimalTypes] = useState<AnimalType[]>(animalTypes);
-    const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({});
+  export function PetDetailModal({
+    open,
+    onClose,
+    pet,
+    animalTypes,
+    onSave,
+  }: Props) {
+    const [localAnimalTypes, setLocalAnimalTypes] =
+      useState<AnimalType[]>(animalTypes);
+    const [form, setForm] = useState<
+      Partial<Pet & { animal_type_id: number | null }>
+    >({});
     const [isDirty, setIsDirty] = useState(false);
   
-    // Sync local copy of animal types
+    // Keep localAnimalTypes in sync
     useEffect(() => {
       setLocalAnimalTypes(animalTypes);
     }, [animalTypes]);
   
-    // Initialize form from pet
+    // Initialize form when modal opens
     useEffect(() => {
-      const matching = animalTypes.find((t) => t.name === pet.animal_type);
-      setForm({ ...pet, animal_type_id: matching?.id ?? null });
-      setIsDirty(false);
-    }, [pet, animalTypes]);
+      if (!pet) return;
   
+      const match = animalTypes.find((t) => t.name === pet.animal_type);
+      setForm({
+        ...pet,
+        animal_type_id: match?.id ?? null,
+      });
+      setIsDirty(false);
+    }, [open, pet, animalTypes]);
+  
+    // React Select expects { value, label }
     const animalTypeOptions = useMemo(() => {
       return localAnimalTypes.map((type) => ({
         value: type.id,
@@ -44,24 +59,19 @@ import {
     }, [localAnimalTypes]);
   
     const selectedAnimalType = useMemo(() => {
-        const id = form.animal_type_id;
-        if (!id) return null;
-      
-        const match = localAnimalTypes.find((t) => t.id === id);
-        if (match) {
-          return { value: match.id, label: match.name };
-        }
-      
-        // 🛠 fallback to constructing something with a label guess
-        return {
-          value: id,
-          label: `Animal Type #${id}`, // or fallback to a generic label
-        };
-      }, [form.animal_type_id, localAnimalTypes]);
+      const id = form.animal_type_id;
+      if (!id) return null;
   
-    const handleChange = (field: keyof typeof form, value: any) => {
-      setForm((f) => {
-        const updated = { ...f, [field]: value };
+      const match = localAnimalTypes.find((t) => t.id === id);
+      return match ? { value: match.id, label: match.name } : null;
+    }, [form.animal_type_id, localAnimalTypes]);
+  
+    const handleChange = (
+      field: keyof typeof form,
+      value: string | number | null
+    ) => {
+      setForm((prev) => {
+        const updated = { ...prev, [field]: value };
         setIsDirty(true);
         return updated;
       });
@@ -122,27 +132,21 @@ import {
                   handleChange("animal_type_id", newValue?.value ?? null)
                 }
                 onCreateOption={async (inputValue) => {
-                    try {
-                      const newType = await createAnimalType(inputValue.trim());
-                      console.log("New type created:", newType);
-                  
-                      setLocalAnimalTypes((prev) => {
-                        const updated = [...prev, newType];
-                        console.log("Updated list of types:", updated);
-                        return updated;
-                      });
-                  
-                      setForm((f) => ({
-                        ...f,
-                        animal_type_id: newType.id,
-                      }));
-                  
-                      setIsDirty(true);
-                    } catch (err) {
-                      alert("Could not create animal type.");
-                      console.error(err);
-                    }
-                  }}                                    
+                  try {
+                    const newType = await createAnimalType(inputValue.trim());
+                    setLocalAnimalTypes((prev) => [...prev, newType]);
+  
+                    // 🔥 Immediate state update
+                    setForm((prev) => ({
+                      ...prev,
+                      animal_type_id: newType.id,
+                    }));
+                    setIsDirty(true);
+                  } catch (err) {
+                    alert("Could not create animal type.");
+                    console.error(err);
+                  }
+                }}
               />
             </div>
   

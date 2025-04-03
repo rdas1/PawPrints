@@ -4,7 +4,7 @@ import { fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
 import { FilterBar } from "@/components/FilterBar";
 import { PetGrid } from "@/components/PetGrid";
-import { fetchPetCount, updatePet } from "@/api/pets";
+import { fetchPet, fetchPetCount, updatePet } from "@/api/pets";
 import { PetFilters } from "@/api/pets";
 import { Pet } from "@/types";
 import { PetDetailModal } from "@/components/PetDetailModal";
@@ -80,7 +80,11 @@ export default function Home() {
       {!loading && (
         <PetGrid
           pets={pets}
-          onCardClick={(pet) => setSelectedPet(pet)}
+          onCardClick={async (pet) => {
+            const fresh = await fetchPet(pet.id);
+            console.log("Fresh pet from API:", fresh); // 👈 check this!
+            setSelectedPet(fresh);
+          }}
         />
       )}
 
@@ -146,8 +150,17 @@ export default function Home() {
           onClose={() => setSelectedPet(null)}
           onSave={async (updated) => {
             await updatePet(selectedPet.id, updated);
-            setSelectedPet(null);
+          
+            // 🔄 Fetch latest animal types
+            const updatedTypes = await fetchAnimalTypes();
+            setAnimalTypes(updatedTypes);
+          
+            // 🔄 Refresh pet data
+            const freshPet = await fetchPet(selectedPet.id);
+            setSelectedPet(freshPet);
+          
             refreshPetList();
+            setTimeout(() => setSelectedPet(null), 0); // close modal
           }}
         />
       )}
