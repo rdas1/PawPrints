@@ -14,7 +14,7 @@ const AnimalType = {
   create(name, callback) {
     console.log("Creating animal type:", name);
     db.run(`INSERT INTO animal_types (name) VALUES (?)`, [name], function (err) {
-      callback(err, { id: this.lastID });
+      callback(err, { id: this.lastID, name: name });
     });
   },
 

@@ -4,8 +4,10 @@ import { fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
 import { FilterBar } from "@/components/FilterBar";
 import { PetGrid } from "@/components/PetGrid";
-import { fetchPetCount } from "@/api/pets";
+import { fetchPetCount, updatePet } from "@/api/pets";
 import { PetFilters } from "@/api/pets";
+import { Pet } from "@/types";
+import { PetDetailModal } from "@/components/PetDetailModal";
 
 export default function Home() {
   const [filters, setFilters] = useState<PetFilters>({
@@ -18,6 +20,7 @@ export default function Home() {
   });
 
   const [animalTypes, setAnimalTypes] = useState<AnimalType[]>([]);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
   useEffect(() => {
     fetchAnimalTypes().then(setAnimalTypes).catch(console.error);
@@ -29,7 +32,7 @@ export default function Home() {
   const [totalPets, setTotalPets] = useState(0);
   const offset = (page - 1) * perPage;
   const totalPages = Math.ceil(totalPets / perPage);
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       const parsed = parseInt(perPageInput, 10);
@@ -37,20 +40,17 @@ export default function Home() {
         setPerPage(parsed);
       }
     }, 300);
-  
+
     return () => clearTimeout(timeout);
   }, [perPageInput]);
 
-  // Memoize filters + pagination for stable reference
   const memoizedFilters = useMemo(
     () => ({ ...filters, limit: perPage, offset }),
     [filters, perPage, offset]
   );
 
-  // Reset to page 1 when filters/perPage change
   useEffect(() => setPage(1), [filters, perPage]);
 
-  // Fetch total pet count when filters change (without pagination)
   useEffect(() => {
     const { limit, offset, ...filterOnly } = memoizedFilters;
     fetchPetCount(filterOnly)
@@ -58,11 +58,14 @@ export default function Home() {
       .catch((err) => console.error("Pet count error:", err));
   }, [memoizedFilters]);
 
-  // Fetch filtered pets
   const { pets, loading, error } = usePets(memoizedFilters);
 
   const startIndex = offset + 1;
   const endIndex = Math.min(offset + pets.length, totalPets);
+
+  const refreshPetList = () => {
+    setFilters((f) => ({ ...f })); // triggers re-fetch via dependency
+  };
 
   return (
     <div>
@@ -74,69 +77,81 @@ export default function Home() {
       />
       {loading && <p className="p-4">Loading...</p>}
       {error && <p className="p-4 text-red-600">Error: {error}</p>}
-      {!loading && <PetGrid pets={pets} /> }
+      {!loading && (
+        <PetGrid
+          pets={pets}
+          onCardClick={(pet) => setSelectedPet(pet)}
+        />
+      )}
+
       <div className="px-4 pt-4">
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    
-    {/* Left: Showing text */}
-    <div className="text-sm text-muted-foreground">
-      {totalPets > 0 && (
-        <span>
-          Showing {startIndex}–{endIndex} of {totalPets} pets
-        </span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-sm text-muted-foreground">
+            {totalPets > 0 && (
+              <span>
+                Showing {startIndex}–{endIndex} of {totalPets} pets
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-2">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-2 py-2 border rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-sm whitespace-nowrap">
+                Page {page} of {totalPages || 1}
+              </span>
+              <button
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-2 py-2 border rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label htmlFor="perPage" className="text-sm whitespace-nowrap">
+                Pets per page:
+              </label>
+              <input
+                id="perPage"
+                type="number"
+                min={1}
+                max={50}
+                value={perPageInput}
+                onChange={(e) => setPerPageInput(e.target.value)}
+                onBlur={() => {
+                  const parsed = parseInt(perPageInput, 10);
+                  if (isNaN(parsed) || parsed < 1 || parsed > 50) {
+                    setPerPageInput(perPage.toString());
+                  }
+                }}
+                className="w-20 border rounded px-2 py-1 text-sm"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      {selectedPet && (
+        <PetDetailModal
+          open={true}
+          pet={selectedPet}
+          animalTypes={animalTypes}
+          onClose={() => setSelectedPet(null)}
+          onSave={async (updated) => {
+            await updatePet(selectedPet.id, updated);
+            setSelectedPet(null);
+            refreshPetList();
+          }}
+        />
       )}
     </div>
-
-    {/* Right: Pagination + Per Page */}
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-      
-      {/* Pagination controls */}
-      <div className="flex items-center gap-2">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-2 py-2 border rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="text-sm whitespace-nowrap">
-          Page {page} of {totalPages || 1}
-        </span>
-        <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-2 py-2 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Per-page selector */}
-      <div className="flex items-center gap-2">
-        <label htmlFor="perPage" className="text-sm whitespace-nowrap">
-          Pets per page:
-        </label>
-        <input
-          id="perPage"
-          type="number"
-          min={1}
-          max={50}
-          value={perPageInput}
-          onChange={(e) => setPerPageInput(e.target.value)}
-          onBlur={() => {
-            const parsed = parseInt(perPageInput, 10);
-            if (isNaN(parsed) || parsed < 1 || parsed > 50) {
-              setPerPageInput(perPage.toString()); // Reset to last valid value
-            }
-          }}
-          className="w-20 border rounded px-2 py-1 text-sm"
-        />
-      </div>
-    </div>
-  </div>
-</div>
-
-
-    </div>
+    
   );
 }

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchPet, updatePet, deletePet } from "@/api/pets";
 import { Pet } from "@/types";
-import { fetchAnimalTypes } from "@/api/animalTypes";
+import { createAnimalType, fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
+import CreatableSelect from "react-select/creatable";
+import { ActionMeta, SingleValue } from "react-select";
 
 export default function PetDetailPage() {
   const { id } = useParams();
@@ -11,7 +13,6 @@ export default function PetDetailPage() {
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({});
-
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,6 @@ export default function PetDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // second useEffect to sync form state
   useEffect(() => {
     if (pet && animalTypes.length > 0) {
       const matching = animalTypes.find((t) => t.name === pet.animal_type);
@@ -43,17 +43,25 @@ export default function PetDetailPage() {
     }
   }, [pet, animalTypes]);
 
+  const animalTypeOptions = animalTypes.map((type) => ({
+    value: type.id,
+    label: type.name,
+  }));
+
+  const selectedAnimalType = animalTypeOptions.find(
+    (opt) => opt.value === form.animal_type_id
+  ) ?? null;
+
   const handleUpdate = async () => {
     if (!id) return;
-  
+
     const { name, status, priority, animal_type_id } = form;
-  
-    // Validate required fields
+
     if (!name || !status || !priority || !animal_type_id) {
       setError("Please fill out all fields.");
       return;
     }
-  
+
     try {
       await updatePet(Number(id), {
         name,
@@ -61,8 +69,7 @@ export default function PetDetailPage() {
         priority,
         animal_type_id,
       });
-  
-      // ✅ Re-fetch full pet details after update
+
       const refreshed = await fetchPet(Number(id));
       setPet(refreshed);
       setEditing(false);
@@ -71,7 +78,6 @@ export default function PetDetailPage() {
       setError((err as Error).message);
     }
   };
-  
 
   const handleDelete = async () => {
     if (!id) return;
@@ -79,7 +85,7 @@ export default function PetDetailPage() {
     if (!confirm) return;
     try {
       await deletePet(Number(id));
-      navigate("/"); // redirect after delete
+      navigate("/");
     } catch (err) {
       setError((err as Error).message);
     }
@@ -105,7 +111,12 @@ export default function PetDetailPage() {
           <select
             className="w-full border px-2 py-1 rounded"
             value={form.status}
-            onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as "Available for Adoption" | "Adopted" | "In Care" }))}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                status: e.target.value as "Available for Adoption" | "Adopted" | "In Care",
+              }))
+            }
           >
             <option value="Available">Available</option>
             <option value="In Care">In Care</option>
@@ -114,49 +125,57 @@ export default function PetDetailPage() {
           <select
             className="w-full border px-2 py-1 rounded"
             value={form.priority}
-            onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value as "Low" | "Medium" | "High" }))}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                priority: e.target.value as "Low" | "Medium" | "High",
+              }))
+            }
           >
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
 
-          <select
-            className="w-full border px-2 py-1 rounded"
-            value={form.animal_type_id ?? ""}
-            onChange={async (e) => {
-                if (e.target.value === "__new__") {
-                const name = window.prompt("Enter new animal type name:");
-                if (!name) return;
-
+          <div className="rounded border p-1">
+            <CreatableSelect
+              isClearable
+              placeholder="Select or create animal type..."
+              options={animalTypeOptions}
+              value={selectedAnimalType}
+              onChange={(
+                newValue: SingleValue<{ value: number; label: string }> | null,
+                actionMeta: ActionMeta<{ value: number; label: string }>
+              ) => {
+                if (!newValue) {
+                  setForm((f) => ({ ...f, animal_type_id: undefined }));
+                } else {
+                  setForm((f) => ({ ...f, animal_type_id: newValue.value }));
+                }
+              }}
+              onCreateOption={async (inputValue) => {
                 try {
-                    const newType = await createAnimalType(name);
-                    setAnimalTypes((prev) => [...prev, newType]);
-                    setForm((f) => ({ ...f, animal_type_id: newType.id }));
+                  const newType = await createAnimalType(inputValue.trim());
+                  setAnimalTypes((prev) => [...prev, newType]);
+                  setForm((f) => ({ ...f, animal_type_id: newType.id }));
                 } catch (err) {
-                    alert("Failed to create new animal type.");
+                  alert("Failed to create new animal type.");
                 }
-                return;
-                }
-
-                setForm((f) => ({ ...f, animal_type_id: Number(e.target.value) }));
-            }}
-            >
-                <option value="">Select animal type</option>
-                {animalTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                    {type.name}
-                    </option>
-                ))}
-                <option value="__new__">➕ Add new animal type…</option>
-            </select>
-
+              }}
+            />
+          </div>
 
           <div className="flex gap-2">
-            <button onClick={handleUpdate} className="bg-blue-600 text-white px-4 py-2 rounded">
+            <button
+              onClick={handleUpdate}
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+            >
               Save
             </button>
-            <button onClick={() => setEditing(false)} className="border px-4 py-2 rounded">
+            <button
+              onClick={() => setEditing(false)}
+              className="border px-4 py-2 rounded"
+            >
               Cancel
             </button>
           </div>
@@ -167,10 +186,16 @@ export default function PetDetailPage() {
           <p><strong>Priority:</strong> {pet.priority}</p>
           <p><strong>Animal Type:</strong> {pet.animal_type}</p>
           <div className="flex gap-2 pt-2">
-            <button onClick={() => setEditing(true)} className="border px-4 py-2 rounded">
+            <button
+              onClick={() => setEditing(true)}
+              className="border px-4 py-2 rounded"
+            >
               Edit
             </button>
-            <button onClick={handleDelete} className="bg-red-600 text-white px-4 py-2 rounded">
+            <button
+              onClick={handleDelete}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
               Delete
             </button>
           </div>

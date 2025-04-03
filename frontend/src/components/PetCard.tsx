@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pet } from "@/types";
-import { Link } from "react-router-dom";
 
 interface PetCardProps {
   pet: Pet;
+  onClick?: (pet: Pet) => void;
 }
 
-export function PetCard({ pet }: PetCardProps) {
+export function PetCard({ pet, onClick }: PetCardProps) {
   return (
-    <Link to={`/pets/${pet.id}`} className="block hover:shadow-md transition">
+    <div onClick={() => onClick?.(pet)} className="cursor-pointer hover:shadow-md transition">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>{pet.name}</CardTitle>
@@ -21,6 +21,6 @@ export function PetCard({ pet }: PetCardProps) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </div>
   );
 }
