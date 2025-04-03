@@ -9,46 +9,31 @@ import {
   import Select from "react-select";
   import CreatableSelect from "react-select/creatable";
   import { AnimalType, createAnimalType } from "@/api/animalTypes";
+  import { createPet } from "@/api/pets"; // ✅ import your API method
   import { Pet } from "@/types";
   import { useEffect, useMemo, useState } from "react";
   
   type Props = {
     open: boolean;
     onClose: () => void;
-    pet: Pet | null;
     animalTypes: AnimalType[];
-    onSave: (updated: Partial<Pet>) => void;
+    onCreate: (created: Pet) => void;
   };
   
-  export function PetDetailModal({
-    open,
-    onClose,
-    pet,
-    animalTypes,
-    onSave,
-  }: Props) {
+  export function CreatePetModal({ open, onClose, animalTypes, onCreate }: Props) {
     const [localAnimalTypes, setLocalAnimalTypes] = useState<AnimalType[]>(animalTypes);
-    const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({});
+    const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({
+      name: "",
+      status: "Available for Adoption",
+      priority: "Medium",
+      animal_type_id: null,
+    });
     const [isDirty, setIsDirty] = useState(false);
+    const [loading, setLoading] = useState(false);
   
     useEffect(() => {
       setLocalAnimalTypes(animalTypes);
     }, [animalTypes]);
-  
-    useEffect(() => {
-      if (!open) return;
-  
-      if (!pet) {
-        setForm({ name: "", status: "Available for Adoption", priority: "Medium", animal_type_id: null });
-      } else {
-        const match = animalTypes.find((t) => t.name === pet.animal_type);
-        setForm({
-          ...pet,
-          animal_type_id: match?.id ?? null,
-        });
-      }
-      setIsDirty(false);
-    }, [open, pet, animalTypes]);
   
     const handleChange = (field: keyof typeof form, value: string | number | null) => {
       setForm((prev) => {
@@ -58,9 +43,8 @@ import {
       });
     };
   
-    // Options
     const statusOptions = [
-      { value: "Available", label: "Available" },
+      { value: "Available for Adoption", label: "Available for Adoption" },
       { value: "In Care", label: "In Care" },
       { value: "Adopted", label: "Adopted" },
     ];
@@ -86,6 +70,29 @@ import {
       (opt) => opt.value === form.animal_type_id
     ) ?? null;
   
+    const handleCreate = async () => {
+      if (!form.name || !form.status || !form.priority || !form.animal_type_id) {
+        alert("Please fill out all fields.");
+        return;
+      }
+  
+      try {
+        setLoading(true);
+        const created = await createPet({
+          name: form.name,
+          status: form.status,
+          priority: form.priority,
+          animal_type_id: form.animal_type_id,
+        });
+        onCreate(created);
+      } catch (err) {
+        alert("Failed to create pet.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent
@@ -99,7 +106,7 @@ import {
           }}
         >
           <DialogHeader>
-            <DialogTitle>{pet ? `Edit ${pet.name}` : "Add New Pet"}</DialogTitle>
+            <DialogTitle>Add New Pet</DialogTitle>
           </DialogHeader>
   
           <div className="space-y-3 pt-2">
@@ -111,7 +118,7 @@ import {
                 placeholder="Pet name"
               />
             </div>
-
+  
             <div className="space-y-1">
               <label className="text-sm font-medium">Animal Type</label>
               <CreatableSelect
@@ -143,7 +150,7 @@ import {
                 }}
               />
             </div>
-
+  
             <div className="space-y-1">
               <label className="text-sm font-medium">Status</label>
               <Select
@@ -179,17 +186,17 @@ import {
                 }}
               />
             </div>
-    
+  
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                disabled={!isDirty}
-                onClick={() => onSave(form)}
+                disabled={!isDirty || loading}
+                onClick={handleCreate}
                 className="bg-blue-600 text-white"
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>

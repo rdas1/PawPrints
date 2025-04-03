@@ -36,6 +36,16 @@ export async function fetchPetCount(filters: PetFilters = {}): Promise<number> {
   return data.total;
 }
 
+export async function createPet(data: Partial<Pet> & { animal_type_id?: number }): Promise<Pet> {
+  const res = await fetch(`${BASE_URL}/pets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create pet");
+  return res.json();
+}
+
 export async function fetchPet(id: number): Promise<Pet> {
   const res = await fetch(`${BASE_URL}/pets/${id}`);
   if (!res.ok) throw new Error("Failed to fetch pet");

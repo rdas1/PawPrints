@@ -8,6 +8,8 @@ import { fetchPet, fetchPetCount, updatePet } from "@/api/pets";
 import { PetFilters } from "@/api/pets";
 import { Pet } from "@/types";
 import { PetDetailModal } from "@/components/PetDetailModal";
+import { CreatePetModal } from "@/components/CreatePetModal";
+import { toast } from "sonner";
 
 export default function Home() {
   const [filters, setFilters] = useState<PetFilters>({
@@ -67,9 +69,36 @@ export default function Home() {
     setFilters((f) => ({ ...f })); // triggers re-fetch via dependency
   };
 
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // const handleViewPet = (pet: Pet) => {
+  //   setFilters({
+  //     name: "",
+  //     status: "",
+  //     priority: "",
+  //     animal_type_id: "",
+  //     sortBy: "",
+  //     sortOrder: ""
+  //   });
+  //   setPage(1);
+  //   setSelectedPet(pet);
+  // };
+
+  useEffect(() => {
+    toast("Test toast");
+  }, []);
+
   return (
     <div>
-      <h1 className="text-2xl font-semibold p-4">Available Pets</h1>
+      <div className="flex items-center justify-between px-4 pt-4">
+        <h1 className="text-2xl font-semibold">Available Pets</h1>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+        >
+          Add Pet
+        </button>
+      </div>
       <FilterBar
         filters={filters}
         setFilters={setFilters}
@@ -164,6 +193,44 @@ export default function Home() {
           }}
         />
       )}
+
+      {showCreateModal && (
+        <CreatePetModal
+          open={true}
+          animalTypes={animalTypes}
+          onClose={() => setShowCreateModal(false)}
+          onCreate={async (created) => {
+            setShowCreateModal(false);
+            setFilters({
+              name: "",
+              status: "",
+              priority: "",
+              animal_type_id: "",
+              sortBy: "",
+              sortOrder: ""
+            });
+            setPage(1); // jump to beginning to help user see new pet
+          
+            console.log("Created pet:", created);
+            
+            // show toast
+            toast('This is a toast');
+            // toast.success(`${created.name} added!`, {
+            //   action: {
+            //     label: "View Pet",
+            //     onClick: () => {
+            //       setSelectedPet(created);
+            //     }
+            //   },
+            //   duration: Infinity,
+            // });
+          
+            refreshPetList();
+          }}          
+        />
+      )}
+
+
     </div>
     
   );

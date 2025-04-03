@@ -69,6 +69,9 @@ const Pet = {
         orderClause = `ORDER BY pets.name COLLATE NOCASE ${direction}`;
       }
     }
+    else {
+      orderClause = `ORDER BY pets.id DESC`;
+    }
 
     let limitClause = "LIMIT 10 OFFSET 0";
     if (limit !== undefined && offset !== undefined) {
