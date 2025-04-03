@@ -1,3 +1,5 @@
+import SleepyFooter from "@/components/SleepyFooter";
+
 export default function About() {
     return (
       <div className="px-4 py-8 max-w-4xl mx-auto text-white space-y-6">
@@ -39,6 +41,8 @@ export default function About() {
         <p className="text-lg leading-relaxed">
           - Rajrishi Das
         </p>
+
+        <SleepyFooter />
       </div>
     );
   }
