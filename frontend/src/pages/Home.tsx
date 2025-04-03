@@ -74,19 +74,6 @@ export default function Home() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // const handleViewPet = (pet: Pet) => {
-  //   setFilters({
-  //     name: "",
-  //     status: "",
-  //     priority: "",
-  //     animal_type_id: "",
-  //     sortBy: "",
-  //     sortOrder: ""
-  //   });
-  //   setPage(1);
-  //   setSelectedPet(pet);
-  // };
-
   useEffect(() => {
     toast("Test toast");
   }, []);
@@ -106,7 +93,7 @@ export default function Home() {
           Add Pet
         </button>
       </div>
-      {loading && <p className="p-4">Loading...</p>}
+      {loading && <p className="p-4 text-white">Loading...</p>}
       {error && <p className="p-4 text-red-600">Error: {error}</p>}
       {!loading && (
         <PetGrid
