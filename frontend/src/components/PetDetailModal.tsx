@@ -87,6 +87,8 @@ import {
       (opt) => opt.value === form.animal_type_id
     ) ?? null;
   
+    const isValid = (form.name?.trim() || "").length > 0;
+
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="max-w-lg top-1/2 left-1/2 fixed transform -translate-x-1/2 -translate-y-1/2 z-50">
@@ -102,6 +104,9 @@ import {
                 onChange={(e) => handleChange("name", e.target.value)}
                 placeholder="Pet name"
               />
+            {form.name?.trim() === "" && (
+                <p className="text-sm text-red-500">Name is required.</p>
+            )}
             </div>
   
             <div className="space-y-1">
@@ -190,7 +195,7 @@ import {
                   Cancel
                 </Button>
                 <Button
-                  disabled={!isDirty}
+                  disabled={!isDirty || !isValid}
                   onClick={() => onSave(form)}
                   className="bg-blue-600 text-white"
                 >

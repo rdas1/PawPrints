@@ -225,6 +225,7 @@ export default function Home() {
             });
             refreshPetList();
           }}
+          onAnimalTypeCreated={(newType) => setAnimalTypes((prev) => [...prev, newType])}
         />
       )}
 

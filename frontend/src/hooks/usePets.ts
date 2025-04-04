@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { fetchPets, PetFilters, Pet } from "@/api/pets";
+import { Pet } from "@/types";
+import { fetchPets, PetFilters } from "@/api/pets";
 
 export function usePets(filters: PetFilters) {
   const [pets, setPets] = useState<Pet[]>([]);

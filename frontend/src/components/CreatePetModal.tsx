@@ -18,9 +18,10 @@ import {
     onClose: () => void;
     animalTypes: AnimalType[];
     onCreate: (created: Pet) => void;
+    onAnimalTypeCreated?: (newType: AnimalType) => void;
   };
   
-  export function CreatePetModal({ open, onClose, animalTypes, onCreate }: Props) {
+  export function CreatePetModal({ open, onClose, animalTypes, onCreate, onAnimalTypeCreated }: Props) {
     const [localAnimalTypes, setLocalAnimalTypes] = useState<AnimalType[]>(animalTypes);
     const [form, setForm] = useState<Partial<Pet & { animal_type_id: number | null }>>({
       name: "",
@@ -92,19 +93,13 @@ import {
         setLoading(false);
       }
     };
+
+    const nameIsValid = (form.name?.trim() || "").length > 0;
+    const animalTypeIsValid = form.animal_type_id != null;
   
     return (
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent
-        //   className="w-full max-w-lg"
-        //   style={{
-        //     position: "fixed",
-        //     top: "50%",
-        //     left: "50%",
-        //     transform: "translate(-50%, -50%)",
-        //     zIndex: 50,
-        //   }}
-        >
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Pet</DialogTitle>
           </DialogHeader>
@@ -117,6 +112,9 @@ import {
                 onChange={(e) => handleChange("name", e.target.value)}
                 placeholder="Pet name"
               />
+            {(form.name?.trim() === "" && isDirty) && (
+                <p className="text-sm text-red-500">Name is required.</p>
+            )}
             </div>
   
             <div className="space-y-1">
@@ -128,19 +126,28 @@ import {
                 value={selectedAnimalType}
                 onChange={(opt) => handleChange("animal_type_id", opt?.value ?? null)}
                 onCreateOption={async (inputValue) => {
-                  try {
-                    const newType = await createAnimalType(inputValue.trim());
-                    setLocalAnimalTypes((prev) => [...prev, newType]);
-                    setForm((prev) => ({
-                      ...prev,
-                      animal_type_id: newType.id,
-                    }));
-                    setIsDirty(true);
-                  } catch (err) {
-                    alert("Could not create animal type.");
-                    console.error(err);
-                  }
-                }}
+                    try {
+                      const newType = await createAnimalType(inputValue.trim());
+                  
+                      // update local dropdown
+                      setLocalAnimalTypes((prev) => [...prev, newType]);
+                  
+                      // notify parent
+                      onAnimalTypeCreated?.(newType);
+                  
+                      // select it
+                      setForm((prev) => ({
+                        ...prev,
+                        animal_type_id: newType.id,
+                      }));
+                  
+                      setIsDirty(true);
+                    } catch (err) {
+                      alert("Could not create animal type.");
+                      console.error(err);
+                    }
+                  }}
+                  
                 styles={{
                   control: (base) => ({
                     ...base,
@@ -149,6 +156,9 @@ import {
                   }),
                 }}
               />
+              {(form.animal_type_id == null && isDirty) && (
+                <p className="text-sm text-red-500">Animal type is required.</p>
+            )}
             </div>
   
             <div className="space-y-1">
@@ -192,7 +202,7 @@ import {
                 Cancel
               </Button>
               <Button
-                disabled={!isDirty || loading}
+                disabled={!isDirty || loading || !nameIsValid || !animalTypeIsValid}
                 onClick={handleCreate}
                 className="bg-blue-600 text-white"
               >
