@@ -26,7 +26,7 @@ export function PetCard({ pet, onClick, onDelete }: Props) {
                   e.stopPropagation(); // prevent card click
                   const confirm = window.confirm(`Delete ${pet.name}?`);
                   if (confirm) onDelete(pet.id);
-                  toast.success(`Pet deleted."`);
+                  toast.success(`Pet deleted.`);
                 }}
               >
                 <Trash2 className="w-4 h-4" />

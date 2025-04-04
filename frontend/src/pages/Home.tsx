@@ -210,11 +210,19 @@ export default function Home() {
             if (changes.length > 0) {
               changes.forEach((field) =>
                 toast.success(`${field} updated!`, {
+                  action: {
+                    label: "View Pet",
+                    onClick: () => setSelectedPet(freshPet),
+                  },
                   duration: 6000,
                 })
               );
             } else {
               toast.success("Pet updated!", {
+                action: {
+                  label: "View Pet",
+                  onClick: () => setSelectedPet(freshPet),
+                },
                 duration: 6000,
               });
             }
