@@ -40,7 +40,18 @@ export default function Home() {
 
   const { pets, loading, error, refetch } = usePets(memoizedFilters);
 
-  useEffect(() => setPage(1), [filters, perPage]);
+  useEffect(() => {
+    setPage(1);
+  }, [
+    filters.name,
+    filters.status,
+    filters.priority,
+    filters.animal_type_id,
+    filters.sortBy,
+    filters.sortOrder,
+    perPage,
+  ]);
+  
 
   useEffect(() => {
     const { limit, offset, ...filterOnly } = memoizedFilters;
