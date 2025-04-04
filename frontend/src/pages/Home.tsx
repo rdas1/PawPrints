@@ -38,14 +38,14 @@ export default function Home() {
     fetchAnimalTypes().then(setAnimalTypes).catch(console.error);
   }, []);
 
+  const { pets, loading, error, refetch } = usePets(memoizedFilters);
+
   useEffect(() => setPage(1), [filters, perPage]);
 
   useEffect(() => {
     const { limit, offset, ...filterOnly } = memoizedFilters;
     fetchPetCount(filterOnly).then(setTotalPets).catch(console.error);
-  }, [memoizedFilters]);
-
-  const { pets, loading, error } = usePets(memoizedFilters);
+  }, [memoizedFilters, pets.length]);
 
   // Show splash screen for minimum of 1s, then set showSplash to false
     useEffect(() => {
@@ -110,7 +110,14 @@ export default function Home() {
         onDelete={async (id) => {
           try {
             await deletePet(id);
-            refreshPetList();
+            
+            const isLastItemOnPage = pets.length === 1;
+            if (isLastItemOnPage && page > 1) {
+              setPage((p) => p - 1); // Go back a page
+            } else {
+              refetch(); // reload current page
+            }
+        
             setSelectedPet(null);
           } catch (err) {
             alert("Failed to delete pet.");
@@ -172,7 +179,14 @@ export default function Home() {
           onDelete={async (id) => {
             try {
               await deletePet(id);
-              refreshPetList();
+          
+              const isLastItemOnPage = pets.length === 1;
+              if (isLastItemOnPage && page > 1) {
+                setPage((p) => p - 1);
+              } else {
+                await refetch(); // assuming you use usePets refetch
+              }
+          
               setSelectedPet(null);
             } catch (err) {
               alert("Failed to delete pet.");

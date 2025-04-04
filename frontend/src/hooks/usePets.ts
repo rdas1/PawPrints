@@ -1,19 +1,28 @@
-import { useEffect, useState } from "react";
-import { fetchPets } from "@/api/pets";
-import { Pet } from "@/types";
+import { useState, useEffect } from "react";
+import { fetchPets, PetFilters, Pet } from "@/api/pets";
 
-export function usePets(filters: any) {
+export function usePets(filters: PetFilters) {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refetch = async () => {
     setLoading(true);
-    fetchPets(filters)
-      .then(setPets)
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const fetched = await fetchPets(filters);
+      setPets(fetched);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch pets");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refetch();
   }, [filters]);
 
-  return { pets, loading, error };
+  return { pets, loading, error, refetch };
 }
