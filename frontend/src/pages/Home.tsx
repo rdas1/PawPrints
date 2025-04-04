@@ -4,7 +4,7 @@ import { fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
 import { FilterBar } from "@/components/FilterBar";
 import { PetGrid } from "@/components/PetGrid";
-import { fetchPet, fetchPetCount, updatePet, deletePet, createPet } from "@/api/pets";
+import { fetchPet, fetchPetCount, updatePet, deletePet } from "@/api/pets";
 import { PetFilters } from "@/api/pets";
 import { Pet } from "@/types";
 import { PetDetailModal } from "@/components/PetDetailModal";
