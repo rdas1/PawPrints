@@ -131,7 +131,7 @@ export default function Home() {
         
             setSelectedPet(null);
           } catch (err) {
-            alert("Failed to delete pet.");
+            toast.error("Failed to delete pet.");
             console.error(err);
           }
         }}
@@ -185,15 +185,42 @@ export default function Home() {
             const freshPet = await fetchPet(selectedPet.id);
             setSelectedPet(freshPet);
             refreshPetList();
-            toast.success(`${updated.name} updated!`, {
-              action: {
-                label: "View Pet",
-                onClick: () => setSelectedPet(freshPet),
-              },
-              duration: 6000,
-            });
+          
+            const changes: string[] = [];
+          
+            if (updated.name && updated.name !== selectedPet.name) {
+              changes.push("Name");
+            }
+          
+            if (updated.status && updated.status !== selectedPet.status) {
+              changes.push("Status");
+            }
+          
+            if (updated.priority && updated.priority !== selectedPet.priority) {
+              changes.push("Priority");
+            }
+          
+            if (
+              updated.animal_type_id &&
+              updated.animal_type_id !== selectedPet.animal_type_id
+            ) {
+              changes.push("Animal Type");
+            }
+          
+            if (changes.length > 0) {
+              changes.forEach((field) =>
+                toast.success(`${field} updated!`, {
+                  duration: 6000,
+                })
+              );
+            } else {
+              toast.success("Pet updated!", {
+                duration: 6000,
+              });
+            }
+          
             setTimeout(() => setSelectedPet(null), 0);
-          }}
+          }}          
           onDelete={async (id) => {
             try {
               await deletePet(id);
@@ -215,7 +242,7 @@ export default function Home() {
                 duration: 6000,
               });
             } catch (err) {
-              alert("Failed to delete pet.");
+              toast.error("Failed to delete pet.");
               console.error(err);
             }
           }}
