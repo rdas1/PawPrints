@@ -1,6 +1,7 @@
 import { Pet } from "@/types";
 import { Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 type Props = {
   pet: Pet;
@@ -25,6 +26,7 @@ export function PetCard({ pet, onClick, onDelete }: Props) {
                   e.stopPropagation(); // prevent card click
                   const confirm = window.confirm(`Delete ${pet.name}?`);
                   if (confirm) onDelete(pet.id);
+                  toast.success(`Pet deleted."`);
                 }}
               >
                 <Trash2 className="w-4 h-4" />

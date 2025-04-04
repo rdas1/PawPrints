@@ -185,6 +185,13 @@ export default function Home() {
             const freshPet = await fetchPet(selectedPet.id);
             setSelectedPet(freshPet);
             refreshPetList();
+            toast.success(`${updated.name} updated!`, {
+              action: {
+                label: "View Pet",
+                onClick: () => setSelectedPet(freshPet),
+              },
+              duration: 6000,
+            });
             setTimeout(() => setSelectedPet(null), 0);
           }}
           onDelete={async (id) => {
@@ -199,6 +206,14 @@ export default function Home() {
               }
           
               setSelectedPet(null);
+              toast.success(`Pet deleted.`, 
+                {
+                // action: {
+                //   label: "Undo", // TODO: implement undo
+                //   onClick: () => setSelectedPet(selectedPet),
+                // },
+                duration: 6000,
+              });
             } catch (err) {
               alert("Failed to delete pet.");
               console.error(err);
@@ -214,12 +229,14 @@ export default function Home() {
           onClose={() => setShowCreateModal(false)}
           onCreate={async (created) => {
             setShowCreateModal(false);
-            setFilters({ name: "", status: "", priority: "", animal_type_id: "", sortBy: "", sortOrder: "" });
-            setPage(1);
-            toast.success(`${created.name} added!`, {
+            const newPet = await fetchPet(created.id);
+            console.log("Created pet:", created);
+            toast.success(`Pet added!`, {
               action: {
                 label: "View Pet",
-                onClick: () => setSelectedPet(created),
+                onClick: () => {
+                  setSelectedPet(newPet)
+                },
               },
               duration: 6000,
             });

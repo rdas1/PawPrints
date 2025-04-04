@@ -12,6 +12,7 @@ import {
   import { createPet } from "@/api/pets"; // ✅ import your API method
   import { Pet } from "@/types";
   import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
   
   type Props = {
     open: boolean;
@@ -87,7 +88,8 @@ import {
         });
         onCreate(created);
       } catch (err) {
-        alert("Failed to create pet.");
+        toast.error("Failed to create pet.");
+        // alert("Failed to create pet.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -143,8 +145,8 @@ import {
                   
                       setIsDirty(true);
                     } catch (err) {
-                      alert("Could not create animal type.");
-                      console.error(err);
+                        toast.error("Could not create animal type.");
+                        console.error(err);
                     }
                   }}
                   

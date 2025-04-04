@@ -1,8 +1,10 @@
 import { Outlet, Link, NavLink } from "react-router-dom";
+import { Toaster } from 'sonner'
 
 export default function MainLayout() {
   return (
     <div className="min-h-screen bg-background-100 text-foreground font-body">
+      <Toaster />
       <nav className="bg-background-100 text-white px-8 pt-4 flex items-center justify-between">
         <div className="text-xl font-display font-semibold">
           <Link to="/">PawPrints</Link></div>
