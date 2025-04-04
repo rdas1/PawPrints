@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { AnimalType } from "@/api/animalTypes";
+import { Button } from "./ui/button";
 
 interface FilterBarProps {
     filters: any;
@@ -9,6 +10,9 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) {
+    
+    const filtersAreActive = Object.values(filters).some((v) => v !== "");
+    
     return (
         <div className="flex flex-wrap gap-4 items-end">
             <Input
@@ -95,6 +99,25 @@ export function FilterBar({ filters, setFilters, animalTypes }: FilterBarProps) 
                     <SelectItem value="name|desc">Name (Z → A)</SelectItem>
                 </SelectContent>
             </Select>
+
+            <Button
+                variant="outline"
+                onClick={() =>
+                    setFilters({
+                    name: "",
+                    status: "",
+                    priority: "",
+                    animal_type_id: "",
+                    sortBy: "",
+                    sortOrder: ""
+                    })
+                }
+                className="text-sm font-medium"
+                disabled={!filtersAreActive}
+                >
+                Clear Filters
+                </Button>
+
 
         </div>
     );

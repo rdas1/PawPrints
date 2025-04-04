@@ -88,7 +88,7 @@ export default function Home() {
         <FilterBar filters={filters} setFilters={setFilters} animalTypes={animalTypes} />
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-[#D67272] text-white hover:bg-[#c55c5c] px-4 py-2 rounded text-md font-semibold font-display self-start md:self-auto"
+          className="bg-[#D67272] text-white hover:bg-[#c55c5c] px-4 py-2 rounded text-md font-semibold font-display self-start md:self-auto cursor-pointer transition"
         >
           Add Pet
         </button>
@@ -127,9 +127,9 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
             <div className="flex items-center gap-2">
-              <Button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="bg-white text-black">Previous</Button>
+              <Button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="bg-white text-black cursor-pointer transition">Previous</Button>
               <span className="text-sm text-white">Page {page} of {totalPages || 1}</span>
-              <Button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="bg-white text-black">Next</Button>
+              <Button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="bg-white text-black cursor-pointer transition">Next</Button>
             </div>
             <div className="flex items-center gap-2">
               <label htmlFor="perPage" className="text-sm text-white">Pets per page:</label>
