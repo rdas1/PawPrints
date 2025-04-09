@@ -4,7 +4,7 @@ import { fetchAnimalTypes } from "@/api/animalTypes";
 import { AnimalType } from "@/api/animalTypes";
 import { FilterBar } from "@/components/FilterBar";
 import { PetGrid } from "@/components/PetGrid";
-import { fetchPet, fetchPetCount, updatePet, deletePet } from "@/api/pets";
+import { fetchPet, fetchPetCount, updatePet, deletePet, createPet } from "@/api/pets";
 import { PetFilters } from "@/api/pets";
 import { Pet } from "@/types";
 import { PetDetailModal } from "@/components/PetDetailModal";
@@ -24,6 +24,8 @@ export default function Home() {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
+
+  const [undoing, setUndoing] = useState(false);
 
   const [page, setPage] = useState(1);
   const [perPageInput, setPerPageInput] = useState("12");
@@ -91,6 +93,61 @@ export default function Home() {
       </div>
     );
   }
+  const handleDelete = async (id: number) => {
+    const deletedPet = pets.find((p) => p.id === id);
+    if (!deletedPet) return;
+  
+    if (undoing) return;
+    setUndoing(true);
+  
+    try {
+      await deletePet(id);
+  
+      // Refresh pagination
+      const isLastItemOnPage = pets.length === 1;
+      if (isLastItemOnPage && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        await refetch();
+      }
+  
+      setSelectedPet(null);
+  
+      toast.success(`Pet deleted.`, {
+        duration: 8000,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            const { name, status, priority, animal_type } = deletedPet;
+
+            const matchingType = animalTypes.find(
+              (t) => t.name === animal_type
+            );
+            
+            if (!matchingType) {
+              toast.error("Could not restore pet: animal type missing.");
+              return;
+            }
+            
+            await createPet({
+              name,
+              status,
+              priority,
+              animal_type_id: matchingType.id,
+            });
+            setPage(1); 
+            await refetch();
+            toast.success(`${name} restored!`);
+          },
+        },
+      });
+    } catch (err) {
+      toast.error("Failed to delete pet.");
+      console.error(err);
+    } finally {
+      setUndoing(false);
+    }
+  };  
 
   return (
     <div>
@@ -118,23 +175,7 @@ export default function Home() {
           const fresh = await fetchPet(pet.id);
           setSelectedPet(fresh);
         }}
-        onDelete={async (id) => {
-          try {
-            await deletePet(id);
-            
-            const isLastItemOnPage = pets.length === 1;
-            if (isLastItemOnPage && page > 1) {
-              setPage((p) => p - 1); // Go back a page
-            } else {
-              refetch(); // reload current page
-            }
-        
-            setSelectedPet(null);
-          } catch (err) {
-            toast.error("Failed to delete pet.");
-            console.error(err);
-          }
-        }}
+        onDelete={handleDelete}
       />
 
       {/* Pagination */}
@@ -229,31 +270,7 @@ export default function Home() {
           
             setTimeout(() => setSelectedPet(null), 0);
           }}          
-          onDelete={async (id) => {
-            try {
-              await deletePet(id);
-          
-              const isLastItemOnPage = pets.length === 1;
-              if (isLastItemOnPage && page > 1) {
-                setPage((p) => p - 1);
-              } else {
-                await refetch(); // assuming you use usePets refetch
-              }
-          
-              setSelectedPet(null);
-              toast.success(`Pet deleted.`, 
-                {
-                // action: {
-                //   label: "Undo", // TODO: implement undo
-                //   onClick: () => setSelectedPet(selectedPet),
-                // },
-                duration: 6000,
-              });
-            } catch (err) {
-              toast.error("Failed to delete pet.");
-              console.error(err);
-            }
-          }}
+          onDelete={handleDelete}
         />
       )}
 
