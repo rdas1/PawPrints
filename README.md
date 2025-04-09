@@ -39,7 +39,7 @@
 ## 📸 Demo
 
 You can try the live app here:  
-👉 [**https://rajrishi.github.io/PawPrints**](https://rajrishi.github.io/PawPrints)
+👉 [**https://rajrishi.github.io/PawPrints**](https://rajrishi.github.io/PawPrints/)
 
 ## 📂 Project Structure
 
