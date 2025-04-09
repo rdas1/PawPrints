@@ -142,7 +142,7 @@ export default function Home() {
         },
       });
     } catch (err) {
-      alert("Failed to delete pet.");
+      toast.error("Failed to delete pet.");
       console.error(err);
     } finally {
       setUndoing(false);
